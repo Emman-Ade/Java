@@ -1,0 +1,159 @@
+/**
+ * File: twoOperandCalculator.java
+ * Class: CSCI 1302
+ * Author: Emmanuel Adeniyi
+ * Created on: Oct 24, 2023
+ * Last Modified: Oct 25, 2023
+ * Description: Creating a java GUI that calculates two numbers based of their operation
+ */
+package ch14;
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
+public class twoOperandCalculator extends Application {
+	@Override
+	public void start(Stage primaryStage) {
+		//creating our labels number 1 and 2
+		Label number1 = new Label("Number 1");
+		Label number2 = new Label("Number 2");
+
+		//label that will show the results
+		Label results = new Label();
+
+		//operation buttons to press 
+		Button btAdd = new Button("+");
+		Button btSubtract = new Button("-");
+		Button btMultiply = new Button("*");
+		Button btDivide = new Button("/");
+
+		//TextField for number 1 and 2 info
+		TextField num1Txt = new TextField();
+		TextField num2Txt = new TextField();
+
+		//creating our classes that have our abstract method operation, and setting it to our action
+		Addition add = new Addition(num1Txt,num2Txt,results);
+		btAdd.setOnAction(add);
+		Subtraction subtract = new Subtraction(num1Txt,num2Txt,results);
+		btSubtract.setOnAction(subtract);
+		Multiplication multiply = new Multiplication(num1Txt,num2Txt,results);
+		btMultiply.setOnAction(multiply);
+		Division divide = new Division(num1Txt,num2Txt,results);
+		btDivide.setOnAction(divide);
+
+		//creating gridpane to display all our info in a row column format 
+		GridPane pane = new GridPane();
+		pane.add(number1, 1, 1);
+		pane.add(num1Txt,2,1);
+		pane.add(number2, 1, 2);
+		pane.add(num2Txt, 2, 2);
+		pane.add(btAdd, 1, 3);
+		pane.add(btSubtract, 2, 3);
+		pane.add(btMultiply, 3, 3);
+		pane.add(btDivide, 4, 3);
+		pane.add(results, 1, 5);
+
+		//creating a scene with our pane, 400 width 300 length
+		Scene scene = new Scene(pane,400,300);
+
+		//setting it to said scene we created
+		primaryStage.setScene(scene);
+		//showing our stage
+		primaryStage.show();
+
+
+
+	}
+	public static void main(String[] args) {
+		launch(args);
+	}
+}
+
+//abstract class that has performOperation method, seeing as that changes depending on our operation
+abstract class Act implements EventHandler<ActionEvent>{
+	//private data members
+	private TextField num1Txt;
+	private TextField num2Txt;
+	private Label results;
+
+
+	//constructor with all our data members
+	public Act(TextField num1Txt, TextField num2Txt, Label results) {
+		//updating data members in constructor
+		this.num1Txt = num1Txt;
+		this.num2Txt = num2Txt;
+		this.results = results;
+
+
+	}
+	//ActionEvent try catch block if NumberFormatException occurs, error handling if nothing is inputed
+	@Override
+	public void handle(ActionEvent e) throws NumberFormatException {
+		try {
+			if(num1Txt != null && num2Txt != null && !num1Txt.getText().isEmpty() && !num2Txt.getText().isEmpty()) {
+				double num1 = Double.parseDouble(num1Txt.getText());
+				double num2 = Double.parseDouble(num2Txt.getText());
+				//calling abstract method to perform any operation from the classes we made with number 1 and 2
+				double operation = performOperation(num1, num2);
+				results.setText(String.format("Result: %.2f",operation));
+			}else {
+				results.setText("Enter value for number 1 and 2");
+			}
+		}catch(NumberFormatException ex) {
+			results.setText("Enter a valid number ex:1");
+		}
+	}
+	//abstract method
+	protected abstract double performOperation(double num1, double num2);
+}
+
+class Addition extends Act implements EventHandler<ActionEvent>{
+	//calling our values from super constructor
+	public Addition(TextField num1Txt, TextField num2Txt, Label results) {
+		super(num1Txt,num2Txt,results);
+	}
+	//returning addition for btAdd
+	@Override
+	protected double performOperation(double num1, double num2) {
+		return num1 + num2;
+	}
+}
+
+class Subtraction extends Act implements EventHandler<ActionEvent>{
+	public Subtraction(TextField num1Txt, TextField num2Txt, Label results) {
+		super(num1Txt,num2Txt,results);
+	}
+	//returning subtraction for btSubtract
+	@Override
+	protected double performOperation(double num1, double num2) {
+		return num1 - num2;
+	}
+}
+
+class Multiplication extends Act implements EventHandler<ActionEvent>{
+	public Multiplication(TextField num1Txt, TextField num2Txt, Label results) {
+		super(num1Txt,num2Txt,results);
+	}
+	//returning multiplication for btMultiply
+	@Override
+	protected double performOperation(double num1, double num2) {
+		return num1 * num2;
+	}
+}
+
+class Division extends Act implements EventHandler<ActionEvent>{
+	public Division(TextField num1Txt, TextField num2Txt, Label results) {
+		super(num1Txt,num2Txt,results);
+	}
+	//returning division for btDivide
+	@Override
+	protected double performOperation(double num1, double num2) {
+		return num1 / num2;
+	}
+}
+
