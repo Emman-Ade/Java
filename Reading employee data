@@ -1,0 +1,128 @@
+/**
+ * File: PAssign09.java
+ * Class: CSCI 1302
+ * Author: Emmanuel Adeniyi
+ * Created on: Nov 19, 2023
+ * Last Modified: Nov 19, 2023
+ * Description: Reading a file and outputting existing data and assigning raises based on Employee salary and years of service
+ */
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+public class PAssign09 {
+	public static void main(String[] args) throws IOException {
+		//creating instance of Employee class
+		Employee employee = new Employee();
+
+		//try catch error handling
+		try(	
+				//data input for data file, and object output to read object
+				DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream("src/employeeData.dat")));	
+				ObjectOutputStream output = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("src/employeeDataProcessed.dat")));
+
+				){
+
+			//while the file exists
+			while(true) {
+
+				//reading the name, salary, and yearsOfService and writing them out(output)
+				String name = input.readUTF();
+				output.writeUTF(name);
+				double salary = input.readDouble();
+				output.writeDouble(salary);
+				int yearsOfService = input.readInt();
+				output.writeInt(yearsOfService);
+
+				//if else-if else statements to assign specific raises depending on the salary and years of service
+				if(salary >= 0 && salary <= 30000 && yearsOfService <= 2 ) {
+					employee.raiseProcess(3);
+				}else if(salary >= 0 && salary <= 30000 && yearsOfService >= 3) {
+					employee.raiseProcess(2.5);
+				}else if(salary <= 60000 && salary > 30000 && yearsOfService <= 5) {
+					employee.raiseProcess(2.25);
+				}else if(salary <= 60000 && salary >30000 && yearsOfService >= 6) {
+					employee.raiseProcess(2);
+				}else if(salary <= 80000 && salary > 60000 && yearsOfService <= 5) {
+					employee.raiseProcess(1.75);
+				}else if(salary <= 80000 && salary > 60000 && yearsOfService >= 6) {
+					employee.raiseProcess(1.5);
+				}else if(salary >= 80000 && yearsOfService <= 5) {
+					employee.raiseProcess(1.25);
+				}else {
+					employee.raiseProcess(1);
+				}
+				//setting the employee's name salary and yearsOfService to the variables we just created
+				employee.setName(name);
+				employee.setSalary(salary);
+				employee.setYearsOfService(yearsOfService);					
+				output.writeObject(employee);
+
+
+			}
+			//catching the end of file
+		}catch(EOFException ex) {
+
+		}
+
+	}
+}
+
+//employee class that implements serializable
+class Employee implements Serializable {
+	//private data members
+	private String name;
+	private double salary;
+	private int yearsOfService;
+
+	//default constructor
+	public Employee() {
+		setName("Bob");
+		setSalary(69.420);
+		setYearsOfService(1);
+	}
+	//convenience constructor 
+	public Employee(String name, double salary, int yearsOfService) {
+		setName(name);
+		setSalary(salary);
+		setYearsOfService(yearsOfService);
+	}
+	//accessors and mutators to update all data members
+	public void setName(String name) {
+		this.name = name;
+	}
+	public void setSalary(double salary) {
+		this.salary = salary;
+	}
+	public void setYearsOfService(int yearsOfService) {
+		this.yearsOfService = yearsOfService;
+	}
+	public String getName() {
+		return name;
+	}
+	public double getSalary() {
+		return salary;
+	}
+	public int getYearsOfService() {
+		return yearsOfService;
+	}
+	//raiseProcess that updates the salary based on the percentage we give it
+	public void raiseProcess(double raisePercentage) {
+		salary *= (1 + raisePercentage / 100);
+	}
+
+	//toString method
+	@Override
+	public String toString() {
+		return String.format("Name: %s%nSalary $%,.2f%nYears of Service: %d",name,salary,yearsOfService);
+	}
+}
